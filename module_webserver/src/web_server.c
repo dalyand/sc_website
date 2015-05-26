@@ -428,6 +428,15 @@ static void prepare_data(chanend c_flash, connection_state_t *st)
   while (!finished) {
     switch (*src) {
     case 255: {
+      /********************************************************************************  
+      int dyn_expr_id = *(src+1); But *(src+1) is out of the buffers range
+      if src points to the last buffer entry! In this case just skip the expression
+      for this time. This expression is handled first with the next iteration.
+      ********************************************************************************/
+      if(src == eod-1){
+          finished = 1;
+          break;
+      }
       int dyn_expr_id = *(src+1);
       char buf[WEB_SERVER_SEND_BUF_SIZE];
       int dyn_expr_len = web_server_dyn_expr(dyn_expr_id, buf,
